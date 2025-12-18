@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SlideEditor } from './SlideEditor';
 import { StyleEditor } from './StyleEditor';
+import { TypographyEditor } from './TypographyEditor';
 import { Plus, Trash2, Copy, Download, Layers } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -159,9 +160,10 @@ export const EditorPanel = ({
       {/* Editor Content */}
       <div className="flex-1 overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <TabsList className="mx-4 mt-4 grid grid-cols-2">
+          <TabsList className="mx-4 mt-4 grid grid-cols-3">
             <TabsTrigger value="content">Content</TabsTrigger>
-            <TabsTrigger value="style">Style</TabsTrigger>
+            <TabsTrigger value="style">Colors</TabsTrigger>
+            <TabsTrigger value="typography">Typography</TabsTrigger>
           </TabsList>
           
           <div className="flex-1 overflow-y-auto p-4 editor-scroll">
@@ -177,6 +179,13 @@ export const EditorPanel = ({
             
             <TabsContent value="style" className="mt-0">
               <StyleEditor
+                config={data.config}
+                onUpdate={(config) => onDataChange({ ...data, config })}
+              />
+            </TabsContent>
+
+            <TabsContent value="typography" className="mt-0">
+              <TypographyEditor
                 config={data.config}
                 onUpdate={(config) => onDataChange({ ...data, config })}
               />

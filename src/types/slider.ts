@@ -5,6 +5,12 @@ export interface SlideButton {
   variant: 'primary' | 'outline';
 }
 
+export interface TextStyle {
+  fontSize: number;
+  letterSpacing: number;
+  color?: string;
+}
+
 export interface Slide {
   id: string;
   title: string[];
@@ -23,9 +29,15 @@ export interface SliderConfig {
   dotColor: string;
   dotActiveColor: string;
   arrowColor: string;
+  // Typography settings
+  titleStyle: TextStyle;
+  subtitleStyle: TextStyle;
+  buttonStyle: TextStyle;
 }
 
 export interface SliderData {
   slides: Slide[];
   config: SliderConfig;
 }
+
+export type ViewportMode = 'mobile' | 'tablet' | 'desktop';

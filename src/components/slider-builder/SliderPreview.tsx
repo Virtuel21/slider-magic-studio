@@ -1,16 +1,23 @@
-import { useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { SliderData } from '@/types/slider';
+import { SliderData, ViewportMode } from '@/types/slider';
 
 interface SliderPreviewProps {
   data: SliderData;
   currentSlide: number;
   onSlideChange: (index: number) => void;
+  viewportMode: ViewportMode;
 }
 
-export const SliderPreview = ({ data, currentSlide, onSlideChange }: SliderPreviewProps) => {
+const viewportSizes = {
+  mobile: { width: 340, height: 700 },
+  tablet: { width: 500, height: 700 },
+  desktop: { width: 800, height: 600 },
+};
+
+export const SliderPreview = ({ data, currentSlide, onSlideChange, viewportMode }: SliderPreviewProps) => {
   const { slides, config } = data;
   const slide = slides[currentSlide];
+  const viewport = viewportSizes[viewportMode];
 
   const goToNext = () => {
     if (currentSlide < slides.length - 1) {
@@ -26,11 +33,23 @@ export const SliderPreview = ({ data, currentSlide, onSlideChange }: SliderPrevi
 
   if (!slide) return null;
 
+  // Compute responsive font sizes based on viewport
+  const scaleFactor = viewportMode === 'desktop' ? 1.2 : viewportMode === 'tablet' ? 1.1 : 1;
+  const titleFontSize = config.titleStyle.fontSize * scaleFactor;
+  const subtitleFontSize = config.subtitleStyle.fontSize * scaleFactor;
+  const buttonFontSize = config.buttonStyle.fontSize * scaleFactor;
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black/30 p-4">
+    <div className="flex items-center justify-center min-h-full bg-black/30 p-4">
       <div
-        className="relative w-full max-w-[340px] h-[90vh] max-h-[700px] rounded-2xl overflow-hidden flex flex-col"
-        style={{ backgroundColor: config.backgroundColor }}
+        className="relative rounded-2xl overflow-hidden flex flex-col transition-all duration-300"
+        style={{
+          backgroundColor: config.backgroundColor,
+          width: `${viewport.width}px`,
+          height: `${viewport.height}px`,
+          maxWidth: '100%',
+          maxHeight: '90vh',
+        }}
       >
         {/* Close button - only on last slide */}
         {currentSlide === slides.length - 1 && (
@@ -63,7 +82,7 @@ export const SliderPreview = ({ data, currentSlide, onSlideChange }: SliderPrevi
         )}
 
         {/* Slide Image */}
-        <div className="h-1/2 w-full overflow-hidden">
+        <div className={viewportMode === 'desktop' ? 'h-2/5' : 'h-1/2'} style={{ width: '100%', overflow: 'hidden' }}>
           <img
             src={slide.imageUrl}
             alt="Slide"
@@ -72,7 +91,7 @@ export const SliderPreview = ({ data, currentSlide, onSlideChange }: SliderPrevi
         </div>
 
         {/* Slide Content */}
-        <div className="h-1/2 flex flex-col items-center justify-end p-5 pb-16 relative">
+        <div className={`${viewportMode === 'desktop' ? 'h-3/5' : 'h-1/2'} flex flex-col items-center justify-end p-5 pb-16 relative`}>
           {/* Title */}
           <div className="text-center mb-2">
             {slide.title.map((line, i) => (
@@ -81,7 +100,8 @@ export const SliderPreview = ({ data, currentSlide, onSlideChange }: SliderPrevi
                 className="font-saira font-black uppercase leading-tight"
                 style={{
                   color: i === 1 && currentSlide === 0 ? config.accentColor : config.titleColor,
-                  fontSize: currentSlide === 2 && i === 1 ? '48px' : i === 1 ? '26px' : '28px',
+                  fontSize: `${titleFontSize}px`,
+                  letterSpacing: `${config.titleStyle.letterSpacing}px`,
                 }}
               >
                 {line}
@@ -97,7 +117,8 @@ export const SliderPreview = ({ data, currentSlide, onSlideChange }: SliderPrevi
                 className="font-archivo font-medium leading-tight"
                 style={{
                   color: config.subtitleColor,
-                  fontSize: '18px',
+                  fontSize: `${subtitleFontSize}px`,
+                  letterSpacing: `${config.subtitleStyle.letterSpacing}px`,
                   fontWeight: i === slide.subtitle.length - 1 && currentSlide === 2 ? 800 : 500,
                 }}
               >
@@ -116,15 +137,17 @@ export const SliderPreview = ({ data, currentSlide, onSlideChange }: SliderPrevi
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-4 flex-wrap justify-center">
             {slide.buttons.map((btn) => (
               <button
                 key={btn.id}
-                className="px-6 py-2 rounded-lg font-saira font-black uppercase text-lg transition-transform hover:scale-105"
+                className="px-6 py-2 rounded-lg font-saira font-black uppercase transition-transform hover:scale-105"
                 style={{
                   backgroundColor: btn.variant === 'primary' ? config.buttonColor : 'transparent',
                   color: btn.variant === 'primary' ? config.buttonTextColor : config.titleColor,
                   border: btn.variant === 'outline' ? `3px solid ${config.titleColor}` : 'none',
+                  fontSize: `${buttonFontSize}px`,
+                  letterSpacing: `${config.buttonStyle.letterSpacing}px`,
                 }}
               >
                 {btn.text}
