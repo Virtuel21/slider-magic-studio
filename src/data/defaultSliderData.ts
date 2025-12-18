@@ -40,6 +40,19 @@ export const defaultSliderData: SliderData = {
     accentColor: '#A3004A',
     dotColor: '#391465',
     dotActiveColor: '#FFFFFF',
-    arrowColor: '#FFCC05'
+    arrowColor: '#FFCC05',
+    // Typography defaults
+    titleStyle: {
+      fontSize: 28,
+      letterSpacing: 0,
+    },
+    subtitleStyle: {
+      fontSize: 18,
+      letterSpacing: 0,
+    },
+    buttonStyle: {
+      fontSize: 18,
+      letterSpacing: 1,
+    }
   }
 };

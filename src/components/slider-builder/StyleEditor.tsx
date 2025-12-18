@@ -31,21 +31,6 @@ export const StyleEditor = ({ config, onUpdate }: StyleEditorProps) => {
           onChange={(v) => updateConfig('buttonColor', v)}
         />
         <ColorPicker
-          label="Button Text"
-          value={config.buttonTextColor}
-          onChange={(v) => updateConfig('buttonTextColor', v)}
-        />
-        <ColorPicker
-          label="Title Color"
-          value={config.titleColor}
-          onChange={(v) => updateConfig('titleColor', v)}
-        />
-        <ColorPicker
-          label="Subtitle Color"
-          value={config.subtitleColor}
-          onChange={(v) => updateConfig('subtitleColor', v)}
-        />
-        <ColorPicker
           label="Accent Color"
           value={config.accentColor}
           onChange={(v) => updateConfig('accentColor', v)}
