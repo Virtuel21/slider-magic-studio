@@ -110,15 +110,21 @@ export const EditorPanel = ({
     setDragOverIndex(null);
   };
 
+  const triggerDownload = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(url);
+  };
+
   const exportData = () => {
     const jsonString = JSON.stringify(data, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'slider-config.json';
-    a.click();
-    URL.revokeObjectURL(url);
+    triggerDownload(blob, 'slider-config.json');
     toast.success('Configuration exported');
   };
 
@@ -528,12 +534,7 @@ export const EditorPanel = ({
 </html>`;
 
     const blob = new Blob([template], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'slider-export.html';
-    a.click();
-    URL.revokeObjectURL(url);
+    triggerDownload(blob, 'slider-export.html');
     toast.success('Export HTML/CSS/JS prêt');
   };
 
