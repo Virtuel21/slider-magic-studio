@@ -123,7 +123,7 @@ export const EditorPanel = ({
   };
 
   const exportHtmlBundle = () => {
-    const sliderDataString = JSON.stringify(data, null, 2).replace(/</g, '\\u003c');
+    const sliderDataString = JSON.stringify(data, null, 2).replace(/</g, '\u003c');
     const template = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -131,218 +131,397 @@ export const EditorPanel = ({
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Slider Export</title>
   <style>
-    :root { color-scheme: light; }
+    @import url('https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,100..900;1,100..900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap');
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #0f172a; display: flex; align-items: center; justify-content: center; padding: 24px; }
-    #sms-slider-root { width: min(100%, 960px); }
-    .sms-slider { position: relative; background: var(--sms-bg); color: var(--sms-title); border-radius: 18px; overflow: hidden; width: 100%; min-height: 520px; box-shadow: 0 25px 70px rgba(15, 23, 42, 0.25); isolation: isolate; }
-    .sms-slides { position: relative; height: 100%; }
-    .sms-slide { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; transform: translateX(12px); transition: opacity 220ms ease, transform 220ms ease; pointer-events: none; }
-    .sms-slide.is-active { opacity: 1; transform: translateX(0); pointer-events: auto; }
-    .sms-image { height: 45%; width: 100%; overflow: hidden; }
-    .sms-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .sms-content { flex: 1; display: flex; flex-direction: column; gap: 10px; justify-content: flex-end; padding: 24px 28px 64px; }
-    .sms-title, .sms-subtitle { display: flex; flex-direction: column; gap: 4px; }
-    .sms-title span { font-family: 'Saira', 'Inter', system-ui, sans-serif; font-weight: 900; text-transform: uppercase; line-height: 1.1; }
-    .sms-subtitle span { font-family: 'Archivo', 'Inter', system-ui, sans-serif; font-weight: 500; line-height: 1.2; }
-    .sms-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-    .sms-buttons a { text-decoration: none; font-family: 'Saira', 'Inter', system-ui, sans-serif; font-weight: 800; text-transform: uppercase; border-radius: 12px; padding: 10px 18px; transition: transform 160ms ease, box-shadow 160ms ease; }
-    .sms-buttons a:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(0,0,0,0.12); }
-    .sms-buttons a.primary { background: var(--sms-button); color: var(--sms-button-text); border: none; }
-    .sms-buttons a.outline { background: transparent; color: var(--sms-title); border: 3px solid var(--sms-title); }
-    .sms-dots { position: absolute; bottom: 16px; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; }
-    .sms-dot { width: 11px; height: 11px; border-radius: 9999px; background: var(--sms-dot); border: none; cursor: pointer; transition: transform 160ms ease, background 160ms ease; }
-    .sms-dot.is-active { background: var(--sms-dot-active); transform: scale(1.05); }
-    .sms-arrow { position: absolute; top: 42%; transform: translateY(-50%); border: none; background: transparent; color: var(--sms-arrow); cursor: pointer; width: 42px; height: 42px; display: grid; place-items: center; font-size: 24px; font-weight: 800; }
-    .sms-arrow:focus-visible { outline: 2px solid var(--sms-dot-active); outline-offset: 4px; border-radius: 10px; }
-    .sms-arrow.prev { left: 6px; }
-    .sms-arrow.next { right: 6px; }
-    .sms-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; border: none; cursor: pointer; background: var(--sms-button); color: var(--sms-button-text); font-weight: 800; }
-    @media (max-width: 640px) {
-      body { padding: 16px; }
-      .sms-slider { min-height: 580px; }
-      .sms-content { padding: 18px 18px 60px; }
+    body { margin: 0; }
+    .inApp {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100dvh;
+      width: 100dvw;
+      padding: 10px;
+      box-sizing: border-box;
+      background-color: #00000020;
+      backdrop-filter: 20px;
+      position: absolute;
+      top: 0;
+    }
+    .inApp #widget {
+      width: 100%;
+      min-width: 300px;
+      max-width: 340px;
+      height: 100dvh;
+      background: ${data.config.backgroundColor};
+      overflow: hidden;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      color: ${data.config.titleColor};
+      position: relative;
+      align-items: center;
+    }
+    .inApp #widget .close{
+      display: none;
+      position: absolute;
+      z-index: 10;
+      right: 16px;
+      top:16px;
+    }
+    .inApp #widget[data-id="1"] .close, .inApp #widget[data-id="0"] .close{
+      display: block;
+      position: absolute;
+      z-index: 10;
+      right: 16px;
+      top:16px;
+    }
+    .inApp #widget img {
+      width: 100%;
+      height: 50%;
+      object-fit: cover;
+    }
+    .inApp .content {
+      padding: 0 20px 30px;
+      box-sizing: border-box;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 50%;
+      justify-content: flex-end;
+    }
+    .inApp .decor {
+      position: absolute;
+      top: 265px;
+      left: -15px;
+      scale: 0.8;
+    }
+
+    .inApp .slide[data-id="0"] .content #title {
+      color: ${data.config.titleColor};
+      font-family: Saira;
+      display: flex;
+      flex-direction: column;
+      line-height: 100%;
+      text-align: center;
+      font-size: ${data.config.titleStyle.fontSize}px;
+      text-transform: uppercase;
+      letter-spacing: ${data.config.titleStyle.letterSpacing}px;
+      font-weight: 900;
+      width: 100%;
+    }
+    .inApp .slide[data-id="0"] .content #title span:nth-child(2) {
+      font-size: ${Math.round(data.config.titleStyle.fontSize * 2.3)}px;
+      line-height: 50%;
+      color: ${data.config.accentColor};
+    }
+    .inApp .slide .content #subtitle {
+      text-align: center;
+      color: ${data.config.subtitleColor};
+      font-size: ${data.config.subtitleStyle.fontSize}px;
+      font-weight: 500;
+      line-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: Archivo;
+      margin: 0;
+      letter-spacing: ${data.config.subtitleStyle.letterSpacing}px;
+    }
+    .inApp .slide .content #subtitle span:nth-child(3) {
+      color: ${data.config.titleColor};
+      display: block;
+      width: 200px;
+      height: 45px;
+      box-sizing: border-box;
+      border: 4px dashed ${data.config.titleColor};
+      background-color: transparent;
+      font-size: ${Math.max(data.config.subtitleStyle.fontSize, data.config.buttonStyle.fontSize)}px;
+      line-height: 100%;
+      padding: 5px 20px;
+      font-weight: 900;
+      margin-top: 10px;
+    }
+    .inApp #button-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: fit-content;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .inApp a {
+      width: 200px;
+      box-sizing: border-box;
+      padding: 5px 40px;
+      height: 50px;
+      background-color: ${data.config.buttonColor};
+      color: ${data.config.buttonTextColor};
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 900;
+      font-family: Saira;
+      font-size: ${data.config.buttonStyle.fontSize + 7}px;
+      margin: 30px 0;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      letter-spacing: ${data.config.buttonStyle.letterSpacing}px;
+    }
+    .inApp a.outline {
+      background: transparent;
+      color: ${data.config.titleColor};
+      border: 4px dashed ${data.config.titleColor};
+    }
+    .inApp .slide[data-id="0"] a {
+      width: 200px;
+      height: 40px;
+      font-size: ${Math.max(data.config.buttonStyle.fontSize, 18)}px;
+      line-height: 100%;
+      padding: 5px 10px;
+    }
+
+    .inApp .dots {
+      display: flex;
+      gap: 8px;
+      position: absolute;
+      bottom: 20px;
+    }
+    .inApp .dot {
+      width: 9px;
+      height: 9px;
+      background: ${data.config.dotColor};
+      border-radius: 50%;
+    }
+    .inApp .dot.active {
+      background: ${data.config.dotActiveColor};
+    }
+    .inApp #widget {
+      position: relative;
+      overflow: hidden;
+    }
+    #slides {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.45s ease;
+      position: relative;
+    }
+    .inApp .slide {
+      height: 100%;
+      width: 100%;
+      opacity: 1;
+      pointer-events: auto;
+      flex: 0 0 100%;
+      position: relative;
+    }
+
+    @media screen and (max-height: 734px){
+      .inApp .decor{
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="sms-slider-root"></div>
+  <div class="inApp">
+    <div id="widget" data-id="0">
+      <div class="close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="4" fill="${data.config.buttonColor}"/>
+          <path d="M20 8L8 20.1527" stroke="${data.config.titleColor}" stroke-width="5" stroke-miterlimit="10" stroke-linecap="round"/>
+          <path d="M8 8.00358L20 20.1562" stroke="${data.config.titleColor}" stroke-width="5" stroke-miterlimit="10" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div id="slides"></div>
+      <div class="dots"></div>
+    </div>
+  </div>
   <script>
     (() => {
       const sliderData = ${sliderDataString};
-      const alignToFlex = (align = 'center') => {
-        switch (align) {
-          case 'left':
-            return 'flex-start';
-          case 'right':
-            return 'flex-end';
-          case 'justify':
-            return 'stretch';
-          default:
-            return 'center';
-        }
-      };
 
-      const justifyForAlign = (align = 'center') => {
-        switch (align) {
-          case 'left':
-            return 'flex-start';
-          case 'right':
-            return 'flex-end';
-          case 'justify':
-            return 'space-between';
-          default:
-            return 'center';
-        }
-      };
+      const views = sliderData.slides.map((slide) => {
+        const title = slide.title
+          .map((line, idx) => \`<span style="color:${idx === 1 ? sliderData.config.accentColor : sliderData.config.titleColor}">${line}</span>\`)
+          .join('');
+        const subtitle = slide.subtitle.map((line) => \`<span>${line}</span>\`).join('');
+        const btn = slide.buttons
+          .map((button) => \`<a href="${button.url}" class="${button.variant === 'outline' ? 'outline' : 'primary'}">${button.text}</a>\`)
+          .join('');
 
-      const root = document.getElementById('sms-slider-root');
-      const slider = document.createElement('div');
-      slider.className = 'sms-slider';
-      slider.style.setProperty('--sms-bg', sliderData.config.backgroundColor);
-      slider.style.setProperty('--sms-button', sliderData.config.buttonColor);
-      slider.style.setProperty('--sms-button-text', sliderData.config.buttonTextColor);
-      slider.style.setProperty('--sms-title', sliderData.config.titleColor);
-      slider.style.setProperty('--sms-subtitle', sliderData.config.subtitleColor);
-      slider.style.setProperty('--sms-accent', sliderData.config.accentColor);
-      slider.style.setProperty('--sms-dot', sliderData.config.dotColor);
-      slider.style.setProperty('--sms-dot-active', sliderData.config.dotActiveColor);
-      slider.style.setProperty('--sms-arrow', sliderData.config.arrowColor);
-
-      const slidesWrapper = document.createElement('div');
-      slidesWrapper.className = 'sms-slides';
-
-      const slides = [];
-      const dots = [];
-
-      sliderData.slides.forEach((slide, index) => {
-        const slideEl = document.createElement('div');
-        slideEl.className = 'sms-slide' + (index === 0 ? ' is-active' : '');
-        slideEl.dataset.index = String(index);
-
-        const imageWrap = document.createElement('div');
-        imageWrap.className = 'sms-image';
-        const img = document.createElement('img');
-        img.src = slide.imageUrl;
-        img.alt = 'Slide ' + (index + 1);
-        imageWrap.appendChild(img);
-
-        const content = document.createElement('div');
-        content.className = 'sms-content';
-
-        const titleBlock = document.createElement('div');
-        titleBlock.className = 'sms-title';
-        const titleAlign = slide.titleStyle?.textAlign || sliderData.config.titleStyle.textAlign || 'center';
-        titleBlock.style.textAlign = titleAlign;
-        titleBlock.style.alignItems = alignToFlex(titleAlign);
-        slide.title.forEach((line, lineIndex) => {
-          const span = document.createElement('span');
-          span.textContent = line;
-          span.style.color = lineIndex === 1 ? sliderData.config.accentColor : sliderData.config.titleColor;
-          span.style.fontSize = sliderData.config.titleStyle.fontSize + 'px';
-          span.style.letterSpacing = sliderData.config.titleStyle.letterSpacing + 'px';
-          titleBlock.appendChild(span);
-        });
-
-        const subtitleBlock = document.createElement('div');
-        subtitleBlock.className = 'sms-subtitle';
-        const subtitleAlign = slide.subtitleStyle?.textAlign || sliderData.config.subtitleStyle.textAlign || 'center';
-        subtitleBlock.style.textAlign = subtitleAlign;
-        subtitleBlock.style.alignItems = alignToFlex(subtitleAlign);
-        slide.subtitle.forEach((line) => {
-          const span = document.createElement('span');
-          span.textContent = line;
-          span.style.color = sliderData.config.subtitleColor;
-          span.style.fontSize = sliderData.config.subtitleStyle.fontSize + 'px';
-          span.style.letterSpacing = sliderData.config.subtitleStyle.letterSpacing + 'px';
-          subtitleBlock.appendChild(span);
-        });
-
-        const buttonsBlock = document.createElement('div');
-        buttonsBlock.className = 'sms-buttons';
-        const buttonAlign = slide.buttonStyle?.textAlign || sliderData.config.buttonStyle.textAlign || 'center';
-        buttonsBlock.style.justifyContent = justifyForAlign(buttonAlign);
-        buttonsBlock.style.alignItems = alignToFlex(buttonAlign);
-
-        slide.buttons.forEach((btn) => {
-          const anchor = document.createElement('a');
-          anchor.textContent = btn.text;
-          anchor.href = btn.url;
-          anchor.target = '_blank';
-          anchor.rel = 'noreferrer';
-          anchor.className = btn.variant === 'outline' ? 'outline' : 'primary';
-          anchor.style.fontSize = sliderData.config.buttonStyle.fontSize + 'px';
-          anchor.style.letterSpacing = sliderData.config.buttonStyle.letterSpacing + 'px';
-          buttonsBlock.appendChild(anchor);
-        });
-
-        content.appendChild(titleBlock);
-        content.appendChild(subtitleBlock);
-        content.appendChild(buttonsBlock);
-
-        slideEl.appendChild(imageWrap);
-        slideEl.appendChild(content);
-        slidesWrapper.appendChild(slideEl);
-        slides.push(slideEl);
+        return {
+          title,
+          subtitle,
+          btn,
+          img: slide.imageUrl
+        };
       });
 
-      const prevBtn = document.createElement('button');
-      prevBtn.className = 'sms-arrow prev';
-      prevBtn.setAttribute('aria-label', 'Previous slide');
-      prevBtn.innerHTML = '&#10094;';
+      const decor = \`<svg xmlns="http://www.w3.org/2000/svg" width="141" height="190" viewBox="0 0 141 190" fill="none">
+            <g clip-path="url(#clip0_2_3269)">
+            <path d="M-72.0328 16.379C-72.1701 34.9661 -68.6552 53.0283 -61.5835 70.0577C-54.7564 86.5059 -44.917 101.301 -32.3417 114.033C-19.7665 126.765 -5.08691 136.797 11.291 143.849C28.2513 151.151 46.292 154.919 64.9134 155.049L66.0131 155.058C65.8378 152.654 65.7279 150.221 65.7416 148.325C65.7551 146.426 65.9017 143.996 66.1137 141.594L65.014 141.585C48.2071 141.468 31.9306 138.071 16.6375 131.486C1.86168 125.127 -11.3841 116.075 -22.7338 104.581C-34.0832 93.0898 -42.9612 79.7404 -49.1214 64.9005C-55.4974 49.5419 -58.6682 33.2503 -58.5444 16.4745" fill="${data.config.titleColor}"/>
+            <path d="M103.775 164.956C105.916 164.903 107.857 163.386 108.373 161.302C108.723 159.926 109.549 152.833 109.582 148.63C109.612 144.431 108.891 137.324 108.563 135.944C108.079 133.852 106.158 132.31 104.02 132.226L81.6669 132.069C79.5257 132.122 77.5846 133.639 77.0684 135.724C76.719 137.099 75.8928 144.192 75.8598 148.395C75.8294 152.594 76.5503 159.701 76.8788 161.081C77.3625 163.173 79.284 164.716 81.4215 164.799L103.775 164.956Z" fill="white"/>
+            </g>
+            <g clip-path="url(#clip1_2_3269)">
+            <path d="M119.91 162.483C119.82 165.403 117.72 168.043 114.86 168.723C103.15 170.753 91.87 170.753 80.16 168.723C77.3 168.043 75.21 165.403 75.11 162.483V131.953C75.2 129.033 77.3 126.393 80.16 125.713C91.87 123.683 103.15 123.683 114.86 125.713C117.72 126.393 119.81 129.033 119.91 131.953V162.483Z" fill="${data.config.buttonColor}"/>
+            <path d="M97.46 157.853C92.24 157.853 87.99 153.603 87.99 148.383V144.233H90.39V148.383C90.39 152.283 93.56 155.453 97.46 155.453C101.36 155.453 104.53 152.283 104.53 148.383V145.433H100.02V143.033H106.93V148.383C106.93 153.603 102.68 157.853 97.46 157.853Z" fill="${data.config.titleColor}"/>
+            <path d="M92.2 136.213C90.95 136.213 89.93 137.233 89.93 138.483C89.93 139.733 90.95 140.753 92.2 140.753C93.45 140.753 94.47 139.733 94.47 138.483C94.47 137.233 93.45 136.213 92.2 136.213ZM107.58 135.183H104.87C103.89 136.613 102.52 138.103 101.56 138.103C100.6 138.103 100.45 137.043 100.45 136.583H97.99C97.99 138.923 99.46 140.563 101.56 140.563C104.65 140.563 107.23 136.143 107.71 135.253L107.57 135.183H107.58Z" fill="${data.config.titleColor}"/>
+            </g>
+            <defs>
+            <clipPath id="clip0_2_3269">
+            <rect width="165" height="169" fill="white" transform="translate(95.3945) rotate(84.4126)"/>
+            </clipPath>
+            <clipPath id="clip1_2_3269">
+            <rect width="85.04" height="85.04" fill="white" transform="translate(55 104.703)"/>
+            </clipPath>
+            </defs>
+          </svg>\`;
 
-      const nextBtn = document.createElement('button');
-      nextBtn.className = 'sms-arrow next';
-      nextBtn.setAttribute('aria-label', 'Next slide');
-      nextBtn.innerHTML = '&#10095;';
 
-      const dotsWrapper = document.createElement('div');
-      dotsWrapper.className = 'sms-dots';
+      const dc = document.querySelector('.inApp');
+      const widget = dc.querySelector('#widget');
+      const slidesContainer = document.getElementById('slides');
+      const dotsContainer = widget.querySelector('.dots');
+      const close = widget.querySelector('.close');
+      let current = 0;
+      let startX = 0;
+      let endX = 0;
 
-      sliderData.slides.forEach((_, index) => {
-        const dot = document.createElement('button');
-        dot.className = 'sms-dot' + (index === 0 ? ' is-active' : '');
-        dot.dataset.index = String(index);
-        dotsWrapper.appendChild(dot);
-        dots.push(dot);
-      });
+      function renderSlides() {
+        slidesContainer.innerHTML = '';
+        dotsContainer.innerHTML = '';
+        views.forEach((v, index) => {
+          const slide = document.createElement('div');
+          slide.classList.add('slide');
+          slide.dataset.id = String(index);
+          slide.innerHTML = \`
+        <img id="widget-img" src="${v.img}" />
+        <div class="content">
+             <div class="decor">
+          ${decor}
+        </div>
+          <h2 id="title">${v.title}</h2>
+          <h3 id="subtitle">${v.subtitle}</h3>
+          <div id="button-wrapper">
+            ${v.btn}
+          </div>
+        </div>
+      \`;
+          slidesContainer.appendChild(slide);
 
-      const closeButton = document.createElement('button');
-      closeButton.className = 'sms-close';
-      closeButton.textContent = '×';
-      closeButton.setAttribute('aria-label', 'Close');
-      closeButton.style.display = sliderData.slides.length > 0 ? 'grid' : 'none';
+          const dot = document.createElement('span');
+          dot.classList.add('dot');
+          dot.dataset.id = String(index);
+          dotsContainer.appendChild(dot);
+        });
+      }
 
-      let activeIndex = 0;
+      function updateSlideContent() {
+        const dots = dotsContainer.querySelectorAll('.dot');
+        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+        widget.dataset.id = String(current);
+        const slides = slidesContainer.querySelectorAll('.slide');
+          slides.forEach((s, i) => {
+            s.classList.toggle('active', i === current);
+          });
+        slidesContainer.style.transform = 'translateX(-' + current * 100 + '%)';
+      }
+      function handleButtons() {
+        const allButtons = dc.querySelectorAll('#slides a');
+        allButtons.forEach((btn) => {
+          const t = btn.textContent?.toLowerCase() || '';
+          btn.addEventListener('click', (e) => e.stopPropagation());
+          if (btn.classList.contains('outline')) {
+            btn.style.backgroundColor = 'transparent';
+            btn.style.borderColor = sliderData.config.titleColor;
+            btn.style.color = sliderData.config.titleColor;
+          }
 
-      const updateSlides = (nextIndex) => {
-        const index = Math.max(0, Math.min(slides.length - 1, nextIndex));
-        slides.forEach((slideEl, i) => {
-          if (i === index) {
-            slideEl.classList.add('is-active');
-          } else {
-            slideEl.classList.remove('is-active');
+          if (t.includes('envoie')) {
+              btn.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  if (typeof SRInApp !== 'undefined') {
+                    SRInApp.trackCustomEvent(
+                      'inApp.click',
+                      {
+                        button:'envoie'
+                      },
+                      'In-App C2U'
+                    );
+                    setTimeout(() => {
+                      SRInApp.close();
+                    },100);
+                  }
+              });
           }
         });
-        dots.forEach((dot, i) => {
-          dot.classList.toggle('is-active', i === index);
+      }
+
+      function attachDotListeners() {
+        const dots = dotsContainer.querySelectorAll('.dot');
+        dots.forEach((dot) => {
+          dot.addEventListener('click', () => {
+            const next = parseInt(dot.dataset.id || '0');
+            if (next !== current) goToSlide(next);
+          });
         });
-        activeIndex = index;
-        closeButton.style.display = index === slides.length - 1 ? 'grid' : 'none';
-      };
+      }
 
-      prevBtn.addEventListener('click', () => updateSlides(activeIndex - 1));
-      nextBtn.addEventListener('click', () => updateSlides(activeIndex + 1));
-      dots.forEach((dot, index) => dot.addEventListener('click', () => updateSlides(index)));
-      closeButton.addEventListener('click', () => slider.remove());
+      function slideToNext() {
+        goToSlide((current + 1) % views.length);
+      }
 
-      slider.appendChild(slidesWrapper);
-      slider.appendChild(prevBtn);
-      slider.appendChild(nextBtn);
-      slider.appendChild(dotsWrapper);
-      slider.appendChild(closeButton);
+      function goToSlide(index) {
+        current = index;
+        updateSlideContent();
+      }
 
-      root.appendChild(slider);
+      let isTouchOnButton = false;
+      slidesContainer.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        endX = startX;
+        const target = e.target;
+        isTouchOnButton = target && target.tagName === 'A';
+      });
+
+      slidesContainer.addEventListener('touchmove', (e) => {
+        endX = e.touches[0].clientX;
+      });
+      
+      slidesContainer.addEventListener('touchend', () => {
+        if (isTouchOnButton) {
+          isTouchOnButton = false;
+          return;
+        }
+        const diff = endX - startX;
+        if (Math.abs(diff) < 10) {
+          return;
+        }
+        if (diff < 0) {
+          slideToNext();
+        } else {
+          const prevIndex = (current - 1 + views.length) % views.length;
+          goToSlide(prevIndex);
+        }
+      });
+      
+      close.addEventListener('click', () => {
+        if (typeof SRInApp !== 'undefined') {
+          SRInApp.close();
+        }
+        });
+
+      renderSlides();
+      attachDotListeners();
+      handleButtons();
+      updateSlideContent();
     })();
   </script>
 </body>
