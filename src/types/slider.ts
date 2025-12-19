@@ -5,10 +5,13 @@ export interface SlideButton {
   variant: 'primary' | 'outline';
 }
 
+export type TextAlignment = 'left' | 'center' | 'right' | 'justify';
+
 export interface TextStyle {
   fontSize: number;
   letterSpacing: number;
   color?: string;
+  textAlign?: TextAlignment;
 }
 
 export interface Slide {

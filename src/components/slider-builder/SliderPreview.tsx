@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { SliderData, ViewportMode } from '@/types/slider';
+import { SliderData, TextAlignment, ViewportMode } from '@/types/slider';
 
 interface SliderPreviewProps {
   data: SliderData;
@@ -14,10 +14,39 @@ const viewportSizes = {
   desktop: { width: 800, height: 600 },
 };
 
+const getAlignItemsClass = (alignment: TextAlignment = 'center') => {
+  switch (alignment) {
+    case 'left':
+      return 'items-start';
+    case 'right':
+      return 'items-end';
+    case 'justify':
+      return 'items-stretch';
+    default:
+      return 'items-center';
+  }
+};
+
+const getJustifyContentClass = (alignment: TextAlignment = 'center') => {
+  switch (alignment) {
+    case 'left':
+      return 'justify-start';
+    case 'right':
+      return 'justify-end';
+    case 'justify':
+      return 'justify-between';
+    default:
+      return 'justify-center';
+  }
+};
+
 export const SliderPreview = ({ data, currentSlide, onSlideChange, viewportMode }: SliderPreviewProps) => {
   const { slides, config } = data;
   const slide = slides[currentSlide];
   const viewport = viewportSizes[viewportMode];
+  const titleAlign = config.titleStyle.textAlign ?? 'center';
+  const subtitleAlign = config.subtitleStyle.textAlign ?? 'center';
+  const buttonAlign = config.buttonStyle.textAlign ?? 'center';
 
   const goToNext = () => {
     if (currentSlide < slides.length - 1) {
@@ -91,9 +120,12 @@ export const SliderPreview = ({ data, currentSlide, onSlideChange, viewportMode 
         </div>
 
         {/* Slide Content */}
-        <div className={`${viewportMode === 'desktop' ? 'h-3/5' : 'h-1/2'} flex flex-col items-center justify-end p-5 pb-16 relative`}>
+        <div className={`${viewportMode === 'desktop' ? 'h-3/5' : 'h-1/2'} flex flex-col justify-end p-5 pb-16 relative gap-2`}>
           {/* Title */}
-          <div className="text-center mb-2">
+          <div
+            className={`w-full flex flex-col mb-2 ${getAlignItemsClass(titleAlign)}`}
+            style={{ textAlign: titleAlign }}
+          >
             {slide.title.map((line, i) => (
               <div
                 key={i}
@@ -110,7 +142,10 @@ export const SliderPreview = ({ data, currentSlide, onSlideChange, viewportMode 
           </div>
 
           {/* Subtitle */}
-          <div className="text-center mb-4">
+          <div
+            className={`w-full flex flex-col mb-4 ${getAlignItemsClass(subtitleAlign)}`}
+            style={{ textAlign: subtitleAlign }}
+          >
             {slide.subtitle.map((line, i) => (
               <div
                 key={i}
@@ -137,7 +172,10 @@ export const SliderPreview = ({ data, currentSlide, onSlideChange, viewportMode 
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-2 mt-4 flex-wrap justify-center">
+          <div
+            className={`flex gap-2 mt-4 flex-wrap ${getJustifyContentClass(buttonAlign)} ${getAlignItemsClass(buttonAlign)}`}
+            style={{ textAlign: buttonAlign }}
+          >
             {slide.buttons.map((btn) => (
               <button
                 key={btn.id}

@@ -45,14 +45,17 @@ export const defaultSliderData: SliderData = {
     titleStyle: {
       fontSize: 28,
       letterSpacing: 0,
+      textAlign: 'center',
     },
     subtitleStyle: {
       fontSize: 18,
       letterSpacing: 0,
+      textAlign: 'center',
     },
     buttonStyle: {
       fontSize: 18,
       letterSpacing: 1,
+      textAlign: 'center',
     }
   }
 };
