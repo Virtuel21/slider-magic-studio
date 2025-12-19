@@ -1,8 +1,8 @@
-import { TextStyle, SliderConfig } from '@/types/slider';
+import { SliderConfig, TextAlignment, TextStyle } from '@/types/slider';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
-import { Type, ALargeSmall, Space } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Type, ALargeSmall, Space, AlignHorizontalJustifyCenter } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 
 interface TypographyEditorProps {
@@ -19,6 +19,8 @@ interface StyleSectionProps {
 }
 
 const StyleSection = ({ label, style, colorValue, onStyleChange, onColorChange }: StyleSectionProps) => {
+  const textAlign = style.textAlign ?? 'center';
+
   return (
     <div className="p-3 bg-muted/30 rounded-lg space-y-3">
       <h4 className="text-sm font-medium text-foreground">{label}</h4>
@@ -59,6 +61,28 @@ const StyleSection = ({ label, style, colorValue, onStyleChange, onColorChange }
           step={0.5}
           className="w-full"
         />
+      </div>
+
+      {/* Text Align */}
+      <div className="space-y-2">
+        <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+          <AlignHorizontalJustifyCenter size={12} />
+          Text Alignment
+        </Label>
+        <Select
+          value={textAlign}
+          onValueChange={(value) => onStyleChange({ ...style, textAlign: value as TextAlignment })}
+        >
+          <SelectTrigger className="h-9 text-xs bg-background border-border">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="left">Left</SelectItem>
+            <SelectItem value="center">Center</SelectItem>
+            <SelectItem value="right">Right</SelectItem>
+            <SelectItem value="justify">Justify</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Color */}
