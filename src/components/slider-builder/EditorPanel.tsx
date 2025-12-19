@@ -128,9 +128,13 @@ export const EditorPanel = ({
     toast.success('Configuration exported');
   };
 
-  const exportHtmlBundle = () => {
-    const sliderDataString = JSON.stringify(data, null, 2).replace(/</g, '\u003c');
-    const template = `<!DOCTYPE html>
+  const buildExportTemplate = (sliderData: SliderData) => {
+    const sliderDataJson = JSON.stringify(sliderData);
+    const sliderDataStringLiteral = JSON.stringify(
+      sliderDataJson.replace(/</g, '\\u003c'),
+    );
+
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -351,7 +355,7 @@ export const EditorPanel = ({
   </div>
   <script>
     (() => {
-      const sliderData = ${sliderDataString};
+      const sliderData = JSON.parse(${sliderDataStringLiteral});
 
       const views = sliderData.slides.map((slide) => {
         const title = slide.title
@@ -533,9 +537,19 @@ export const EditorPanel = ({
 </body>
 </html>`;
 
-    const blob = new Blob([template], { type: 'text/html' });
-    triggerDownload(blob, 'slider-export.html');
-    toast.success('Export HTML/CSS/JS prêt');
+    return template;
+  };
+
+  const exportHtmlBundle = () => {
+    try {
+      const template = buildExportTemplate(data);
+      const blob = new Blob([template], { type: 'text/html' });
+      triggerDownload(blob, 'slider-export.html');
+      toast.success('Export HTML/CSS/JS prêt');
+    } catch (error) {
+      console.error('Failed to export HTML bundle', error);
+      toast.error("L'export du code a échoué. Réessaie plus tard.");
+    }
   };
 
   return (
@@ -551,6 +565,7 @@ export const EditorPanel = ({
             variant="outline"
             size="sm"
             onClick={exportData}
+            type="button"
             className="gap-2"
           >
             <Download size={14} />
@@ -559,6 +574,7 @@ export const EditorPanel = ({
           <Button
             size="sm"
             onClick={exportHtmlBundle}
+            type="button"
             className="gap-2"
           >
             <FileCode size={14} />
